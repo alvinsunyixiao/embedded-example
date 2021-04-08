@@ -150,7 +150,6 @@ void StartDefaultTask(void *argument)
     HAL_GPIO_TogglePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin);
     osDelay(500);
 
-    /* reference code for RGB led control
     memset(pixels[0].R, T_HIGH, 8);
     memset(pixels[0].G, T_LOW, 8);
     memset(pixels[0].B, T_LOW, 8);
@@ -165,7 +164,6 @@ void StartDefaultTask(void *argument)
     memset(pixels[0].G, T_LOW, 8);
     memset(pixels[0].B, T_HIGH, 8);
     osDelay(500);
-    */
   }
   /* USER CODE END StartDefaultTask */
 }

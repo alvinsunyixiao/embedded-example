@@ -53,7 +53,7 @@
 /* It's up to user to redefine and/or remove those define */
 #define APP_RX_DATA_SIZE  1000
 #define APP_TX_DATA_SIZE  1000
-
+#define RX_SIGNAL 1 
 /* USER CODE END EXPORTED_DEFINES */
 
 /**

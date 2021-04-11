@@ -57,6 +57,8 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 static rgb_t pixels[NUM_DATA];
+extern int32_t x_raw; 
+extern int32_t y_raw;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -68,13 +70,16 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
+int getRGB(int rx, int ry, int i, int j);
+void set_RGB(int i, int j, int r, int g, int b);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
 
+
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+
 
 /**
   * @brief  FreeRTOS initialization
@@ -150,24 +155,26 @@ void StartDefaultTask(void *argument)
     HAL_GPIO_TogglePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin);
     osDelay(500);
 
+    //set_RGB(0,0,0,1,1);
     //wait
     uint32_t flags = osThreadFlagsWait(RX_SIGNAL, osFlagsWaitAll, osWaitForever);
 
     if(flags){
-    memset(pixels[0].R, T_HIGH, 8);
-    memset(pixels[0].G, T_LOW, 8);
-    memset(pixels[0].B, T_LOW, 8);
-    osDelay(500);
+    
+    // memset(pixels[0].R, T_HIGH, 8);
+    // memset(pixels[0].G, T_LOW, 8);
+    // memset(pixels[0].B, T_LOW, 8);
+    // osDelay(500);
 
-    memset(pixels[0].R, T_LOW, 8);
-    memset(pixels[0].G, T_HIGH, 8);
-    memset(pixels[0].B, T_LOW, 8);
-    osDelay(500);
+    // memset(pixels[0].R, T_LOW, 8);
+    // memset(pixels[0].G, T_HIGH, 8);
+    // memset(pixels[0].B, T_LOW, 8);
+    // osDelay(500);
 
-    memset(pixels[0].R, T_LOW, 8);
-    memset(pixels[0].G, T_LOW, 8);
-    memset(pixels[0].B, T_HIGH, 8);
-    osDelay(500);
+    // memset(pixels[0].R, T_LOW, 8);
+    // memset(pixels[0].G, T_LOW, 8);
+    // memset(pixels[0].B, T_HIGH, 8);
+    // osDelay(500);
     }
     
     
@@ -177,7 +184,85 @@ void StartDefaultTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+void set_RGB(int i, int j, int r, int g, int b){
+  int r_val; 
+  int g_val;
+  int b_val;
+  int index;   
+  if(r==0)
+  r_val = T_LOW; 
+  else
+  r_val = T_HIGH; 
 
+  if(g==0)
+  g_val = T_LOW; 
+  else
+  g_val = T_HIGH;
+
+  if(b==0)
+  b_val = T_LOW; 
+  else
+  b_val = T_HIGH;
+  
+  //case1: normal case  
+  if(i%2 == 0){
+    index = i*8+j;
+    memset(pixels[index].R, r_val, 8);
+    memset(pixels[index].G, g_val, 8);
+    memset(pixels[index].B, b_val, 8);
+    osDelay(500);
+  }
+
+  //case2: odd number of rows 
+  else{
+    int j_fix = 7-j;
+    index = i*8+j_fix;
+    memset(pixels[index].R, r_val, 8);
+    memset(pixels[index].G, g_val, 8);
+    memset(pixels[index].B, b_val, 8);
+  }
+
+}
+
+
+int getRGB(int rx, int ry, int i, int j){
+  /*
+    Retval:
+          0: Dim
+          1: Red
+          2: Green
+          3: Blue  
+  */
+
+  //if inner frame, return and illuminate blue
+  if ( (i==2 && j >= 2 && j <= 5) || (j==2 && i >= 2 && i <=5) )
+  return 3; 
+  
+  //First convert to an index compatible with LED matrix (all integers ) 
+  int flag;
+  if (rx > 0)
+  rx = rx + 3;
+  else
+  rx = rx + 4;
+
+  if (ry > 0)
+  ry = ry + 3;
+  else 
+  ry = ry + 4; 
+
+  //then check if this is a good alignment
+  if(rx >= 2 && rx <= 5&& ry >=2 && ry <=5 )
+  flag = 2; 
+  else
+  flag = 1;
+
+  //if on the frame or overlap with the actual drone position, light to corresponding color  
+  if(i == 0 || i == 7|| j == 0 || j ==7 || (i == rx && j == ry) )
+  return flag;
+  //if not, stay dim
+  else 
+  return 0;  
+}
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

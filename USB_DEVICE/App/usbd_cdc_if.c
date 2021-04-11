@@ -262,7 +262,20 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  //instantiate two coordinates and set them as global var
+  //recast *Buf to type uint32 and dereference 
+   
+  int32_t x_raw = (int32_t*)Buf[0];
+  
+  int32_t y_raw = (int32_t*)Buf[1];
+
+  //transform the coordinate to normal X-Y system (x,y) --> (-x,-y)
+  x_raw = -x_raw;
+  y_raw = -y_raw; 
+
+
   osThreadFlagsSet(defaultTaskHandle, RX_SIGNAL);
+
   return (USBD_OK);
   /* USER CODE END 6 */
 }

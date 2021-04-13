@@ -42,7 +42,7 @@ typedef struct {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NUM_LEDS  1
+#define NUM_LEDS  64
 #define NUM_RESET 64
 #define NUM_DATA  (NUM_LEDS + NUM_RESET)
 #define T_LOW     2
@@ -150,19 +150,25 @@ void StartDefaultTask(void *argument)
     HAL_GPIO_TogglePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin);
     osDelay(500);
 
-    memset(pixels[0].R, T_HIGH, 8);
-    memset(pixels[0].G, T_LOW, 8);
-    memset(pixels[0].B, T_LOW, 8);
+    for (size_t i = 0; i < NUM_LEDS; ++i) {
+      memset(pixels[i].R, T_HIGH, 8);
+      memset(pixels[i].G, T_LOW, 8);
+      memset(pixels[i].B, T_LOW, 8);
+    }
     osDelay(500);
 
-    memset(pixels[0].R, T_LOW, 8);
-    memset(pixels[0].G, T_HIGH, 8);
-    memset(pixels[0].B, T_LOW, 8);
+    for (size_t i = 0; i < NUM_LEDS; ++i) {
+      memset(pixels[i].R, T_LOW, 8);
+      memset(pixels[i].G, T_HIGH, 8);
+      memset(pixels[i].B, T_LOW, 8);
+    }
     osDelay(500);
 
-    memset(pixels[0].R, T_LOW, 8);
-    memset(pixels[0].G, T_LOW, 8);
-    memset(pixels[0].B, T_HIGH, 8);
+    for (size_t i = 0; i < NUM_LEDS; ++i) {
+      memset(pixels[i].R, T_LOW, 8);
+      memset(pixels[i].G, T_LOW, 8);
+      memset(pixels[i].B, T_HIGH, 8);
+    }
     osDelay(500);
   }
   /* USER CODE END StartDefaultTask */

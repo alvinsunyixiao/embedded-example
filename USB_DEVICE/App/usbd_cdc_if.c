@@ -95,7 +95,9 @@ uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
 uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
-
+int32_t x_raw = -100;
+  
+int32_t y_raw = -100;
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
@@ -265,11 +267,12 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   //instantiate two coordinates and set them as global var
   //recast *Buf to type uint32 and dereference 
    
-  int32_t x_raw = (int32_t*)Buf[0];
-  
-  int32_t y_raw = (int32_t*)Buf[1];
+
 
   //transform the coordinate to normal X-Y system (x,y) --> (-x,-y)
+  int32_t* int_buf = (int32_t*)Buf;
+  x_raw = int_buf[0];
+  y_raw = int_buf[1];
   x_raw = -x_raw;
   y_raw = -y_raw; 
 

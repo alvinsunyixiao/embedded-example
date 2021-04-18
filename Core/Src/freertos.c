@@ -42,7 +42,7 @@ typedef struct {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NUM_LEDS  1
+#define NUM_LEDS  64
 #define NUM_RESET 64
 #define NUM_DATA  (NUM_LEDS + NUM_RESET)
 #define T_LOW     2
@@ -154,12 +154,48 @@ void StartDefaultTask(void *argument)
   while (1) {
     HAL_GPIO_TogglePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin);
     osDelay(500);
-
-    //set_RGB(0,0,0,1,1);
-    //wait
+    //set_RGB(3,5,0,0,1);
+        //wait
     uint32_t flags = osThreadFlagsWait(RX_SIGNAL, osFlagsWaitAll, osWaitForever);
+    if (flags & RX_SIGNAL)
+    {
+      int rx = x_raw;
+      int ry = y_raw;
+      // int a =3;
+      // int b =5; 
+      int color_flag;
+      // color_flag = getRGB(rx,ry,a,b);
+      // if(color_flag == 0)
+      // set_RGB(a,b,0,0,0);
+      // if(color_flag == 1)
+      // set_RGB(a,b,1,0,0);
+      // if(color_flag == 2)
+      // set_RGB(a,b,0,1,0);
+      // if(color_flag == 3)
+      // set_RGB(a,b,0,0,1);
+      for (int a = 0; a < 8; a++)
+      {
+        for (int b = 0; b < 8; b++)
+        {
+          color_flag = getRGB(rx,ry,a,b);
+          if(color_flag == 0)
+          set_RGB(a,b,0,0,0);
+          if(color_flag == 1)
+          set_RGB(a,b,1,0,0);
+          if(color_flag == 2)
+          set_RGB(a,b,0,1,0);
+          if(color_flag == 3)
+          set_RGB(a,b,0,0,1);
+          
+        }
+        
+      }
+    
+    }
+    //set_RGB(0,0,0,1,1);
 
-    if(flags){
+
+    //if(flags){
     
     // memset(pixels[0].R, T_HIGH, 8);
     // memset(pixels[0].G, T_LOW, 8);
@@ -175,7 +211,7 @@ void StartDefaultTask(void *argument)
     // memset(pixels[0].G, T_LOW, 8);
     // memset(pixels[0].B, T_HIGH, 8);
     // osDelay(500);
-    }
+    //}
     
     
   }
@@ -207,19 +243,19 @@ void set_RGB(int i, int j, int r, int g, int b){
   //case1: normal case  
   if(i%2 == 0){
     index = i*8+j;
-    memset(pixels[index].R, r_val, 8);
-    memset(pixels[index].G, g_val, 8);
-    memset(pixels[index].B, b_val, 8);
-    osDelay(500);
+    memset(pixels[index].R+4, r_val, 4);
+    memset(pixels[index].G+4, g_val, 4);
+    memset(pixels[index].B+4, b_val, 4);
+    //osDelay(500);
   }
 
   //case2: odd number of rows 
   else{
     int j_fix = 7-j;
     index = i*8+j_fix;
-    memset(pixels[index].R, r_val, 8);
-    memset(pixels[index].G, g_val, 8);
-    memset(pixels[index].B, b_val, 8);
+    memset(pixels[index].R+4, r_val, 4);
+    memset(pixels[index].G+4, g_val, 4);
+    memset(pixels[index].B+4, b_val, 4);
   }
 
 }
@@ -233,31 +269,28 @@ int getRGB(int rx, int ry, int i, int j){
           2: Green
           3: Blue  
   */
+  if(rx >=4 || ry >=4 || rx <=-4 || ry<=-4)
+  return 0; 
+  int flag = 0;
 
-  //if inner frame, return and illuminate blue
-  if ( (i==2 && j >= 2 && j <= 5) || (j==2 && i >= 2 && i <=5) )
-  return 3; 
-  
-  //First convert to an index compatible with LED matrix (all integers ) 
-  int flag;
-  if (rx > 0)
-  rx = rx + 3;
-  else
-  rx = rx + 4;
-
-  if (ry > 0)
-  ry = ry + 3;
-  else 
-  ry = ry + 4; 
 
   //then check if this is a good alignment
-  if(rx >= 2 && rx <= 5&& ry >=2 && ry <=5 )
+  if(rx ==0 && ry ==0 )
   flag = 2; 
   else
   flag = 1;
 
+  //check object
+  if((i == rx+3 || i==rx+4)&& (j == ry+3 || j == ry+4))
+  return flag;
+
+  //if inner frame, return and illuminate blue
+  if ( (i==2 && j >= 2 && j <= 5) || (j==2 && i >= 2 && i <=5) || (i ==5 && j >= 2 && j <= 5) || (j==5 && i >= 2 && i <=5) )
+  return 3; 
+  
+ 
   //if on the frame or overlap with the actual drone position, light to corresponding color  
-  if(i == 0 || i == 7|| j == 0 || j ==7 || (i == rx && j == ry) )
+  if(i == 0 || i == 7|| j == 0 || j ==7 )
   return flag;
   //if not, stay dim
   else 

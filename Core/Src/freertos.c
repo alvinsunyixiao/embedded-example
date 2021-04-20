@@ -144,31 +144,30 @@ void StartDefaultTask(void *argument)
     memset(pixels, T_LOW, NUM_LEDS * sizeof(rgb_t));
   }
 
+  pixels[1].G[0] = T_HIGH;
+  pixels[14].G[0] = T_HIGH;
+  pixels[17].G[0] = T_HIGH;
+
+  pixels[46].G[0] = T_HIGH;
+  pixels[49].G[0] = T_HIGH;
+  pixels[62].G[0] = T_HIGH;
+
+  pixels[13].R[0] = T_HIGH;
+  pixels[50].R[0] = T_HIGH;
+
+  pixels[20].G[0] = T_HIGH;
+  pixels[21].G[0] = T_HIGH;
+  pixels[22].G[0] = T_HIGH;
+  pixels[27].G[0] = T_HIGH;
+  pixels[36].G[0] = T_HIGH;
+  pixels[41].G[0] = T_HIGH;
+  pixels[42].G[0] = T_HIGH;
+  pixels[43].G[0] = T_HIGH;
+
   HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_3, (uint32_t*)pixels, NUM_DATA * sizeof(rgb_t));
   /* Infinite loop */
   while (1) {
     HAL_GPIO_TogglePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin);
-    osDelay(500);
-
-    for (size_t i = 0; i < NUM_LEDS; ++i) {
-      memset(pixels[i].R, T_HIGH, 8);
-      memset(pixels[i].G, T_LOW, 8);
-      memset(pixels[i].B, T_LOW, 8);
-    }
-    osDelay(500);
-
-    for (size_t i = 0; i < NUM_LEDS; ++i) {
-      memset(pixels[i].R, T_LOW, 8);
-      memset(pixels[i].G, T_HIGH, 8);
-      memset(pixels[i].B, T_LOW, 8);
-    }
-    osDelay(500);
-
-    for (size_t i = 0; i < NUM_LEDS; ++i) {
-      memset(pixels[i].R, T_LOW, 8);
-      memset(pixels[i].G, T_LOW, 8);
-      memset(pixels[i].B, T_HIGH, 8);
-    }
     osDelay(500);
   }
   /* USER CODE END StartDefaultTask */
